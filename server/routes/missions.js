@@ -34,17 +34,12 @@ router.put("/:id/status", async (req, res) => {
   }
 });
 
-router.put("/:id/status", async (req, res) => {
-  const { status } = req.body;
+router.delete("/:id", async (req, res) => {
   try {
-    const mission = await Mission.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-    res.json(mission);
+    await Mission.findByIdAndDelete(req.params.id);
+    res.json({ message: "Mission deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Failed to update mission status" });
+    res.status(500).json({ message: "Failed to delete mission" });
   }
 });
 

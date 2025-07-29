@@ -66,7 +66,7 @@ function NewMission() {
                 type="number"
                 placeholder="Enter Altitude (m)"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(e) => setForm({ ...form, altitude: e.target.value })}
               />
             </div>
 

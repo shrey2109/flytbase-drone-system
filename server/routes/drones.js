@@ -18,4 +18,15 @@ router.post("/mock", async (req, res) => {
   res.json(drone);
 });
 
+// GET /api/drones/:id
+router.get("/:id", async (req, res) => {
+  try {
+    const drone = await Drone.findById(req.params.id);
+    if (!drone) return res.status(404).send("Drone not found");
+    res.json(drone);
+  } catch (err) {
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;

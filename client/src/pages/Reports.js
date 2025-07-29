@@ -33,6 +33,18 @@ function Reports() {
     setFiltered(filteredList);
   }, [search, statusFilter, missions]);
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this mission?"))
+      return;
+    try {
+      await api.delete(`/missions/${id}`);
+      setMissions((prev) => prev.filter((m) => m._id !== id));
+    } catch (err) {
+      console.error("Delete failed", err);
+      alert("Failed to delete mission.");
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -71,12 +83,22 @@ function Reports() {
                 <p>Altitude: {m.altitude}m</p>
                 <p>Drone: {m.droneId?.name || "N/A"}</p>
                 <p>Created: {new Date(m.createdAt).toLocaleString()}</p>
-                <Link
-                  to={`/monitor/${m._id}`}
-                  className="text-blue-600 underline text-sm"
-                >
-                  Monitor Mission
-                </Link>
+
+                <div className="flex gap-4 mt-3">
+                  <Link
+                    to={`/monitor/${m._id}`}
+                    className="text-blue-600 underline text-sm"
+                  >
+                    Monitor Mission
+                  </Link>
+
+                  <button
+                    onClick={() => handleDelete(m._id)}
+                    className="text-red-600 text-sm underline"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

@@ -9,7 +9,24 @@ function Monitor() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("not-started");
   const [intervalId, setIntervalId] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [drone, setDrone] = useState(null);
   const { id: missionId } = useParams();
+
+  useEffect(() => {
+    // Fetch mission details
+    if (missionId) {
+      api.get(`/missions`).then((res) => {
+        const mission = res.data.find((m) => m._id === missionId);
+        if (mission?.droneId) {
+          // Now fetch drone details
+          api
+            .get(`/drones/${mission.droneId._id}`)
+            .then((res) => setDrone(res.data));
+        }
+      });
+    }
+  }, [missionId]);
 
   const startMission = () => {
     if (status === "in-progress") return;
@@ -45,7 +62,6 @@ function Monitor() {
   useEffect(() => {
     if (progress >= 100 && status !== "completed") {
       setStatus("completed");
-
       if (missionId) {
         api
           .put(`/missions/${missionId}/status`, { status: "completed" })
@@ -61,6 +77,7 @@ function Monitor() {
         <h1 className="text-2xl font-bold text-blue-700 mb-4">
           Live Mission Monitor
         </h1>
+
         <div className="flex flex-wrap gap-4 items-center">
           <button
             onClick={startMission}
@@ -95,8 +112,32 @@ function Monitor() {
               iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149060.png",
               iconSize: [32, 32],
             })}
+            eventHandlers={{
+              click: () => setShowDetails(true),
+            }}
           />
         </MapContainer>
+
+        {showDetails && drone && (
+          <div className="absolute top-10 right-10 bg-white p-4 shadow-xl rounded-lg z-[1000]">
+            <h2 className="text-lg font-bold">Drone Details</h2>
+            <p>
+              <b>Model:</b> {drone.model}
+            </p>
+            <p>
+              <b>Battery:</b> {drone.battery || "85%"}
+            </p>
+            <p>
+              <b>Status:</b> {status}
+            </p>
+            <button
+              onClick={() => setShowDetails(false)}
+              className="text-blue-600 mt-2"
+            >
+              Close
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
